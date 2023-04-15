@@ -36,12 +36,12 @@ create_exception!(
 /// ```
 #[pyclass(unsendable)]
 pub struct YTransaction {
-    pub inner: Transaction,
+    pub inner: Transaction<'static>,
     pub cached_before_state: Option<PyObject>,
 }
 
 impl Deref for YTransaction {
-    type Target = Transaction;
+    type Target = Transaction<'static>;
 
     fn deref(&self) -> &Self::Target {
         &self.inner

@@ -264,7 +264,7 @@ impl YText {
 #[pyclass(unsendable)]
 pub struct YTextEvent {
     inner: *const TextEvent,
-    txn: *const Transaction,
+    txn: *const Transaction<'static>,
     target: Option<PyObject>,
     delta: Option<PyObject>,
 }

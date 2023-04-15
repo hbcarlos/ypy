@@ -494,7 +494,7 @@ pub enum Index<'a> {
 #[pyclass(unsendable)]
 pub struct YArrayEvent {
     inner: *const ArrayEvent,
-    txn: *const Transaction,
+    txn: *const Transaction<'static>,
     target: Option<PyObject>,
     delta: Option<PyObject>,
 }

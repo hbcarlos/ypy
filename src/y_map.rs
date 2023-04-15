@@ -488,7 +488,7 @@ impl ValueIterator {
 #[pyclass(unsendable)]
 pub struct YMapEvent {
     inner: *const MapEvent,
-    txn: *const Transaction,
+    txn: *const Transaction<'static>,
     target: Option<PyObject>,
     keys: Option<PyObject>,
 }

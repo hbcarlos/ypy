@@ -8,8 +8,8 @@ use yrs::types::{DeepObservable, EntryChange, Path, PathSegment};
 use yrs::SubscriptionId;
 use yrs::Transaction;
 use yrs::Xml;
-use yrs::XmlElement;
-use yrs::XmlText;
+use yrs::XmlElementRef;
+use yrs::XmlTextRef;
 
 use crate::shared_types::{DeepSubscription, ShallowSubscription};
 use crate::type_conversions::{events_into_py, ToPython};
@@ -29,7 +29,7 @@ use crate::y_transaction::YTransaction;
 ///   using interleave-resistant algorithm, where order of concurrent inserts at the same index
 ///   is established using peer's document id seniority.
 #[pyclass(unsendable)]
-pub struct YXmlElement(pub XmlElement);
+pub struct YXmlElement(pub XmlElementRef);
 
 #[pymethods]
 impl YXmlElement {
@@ -146,7 +146,7 @@ impl YXmlElement {
     /// unspecified order.
     pub fn attributes(&self) -> YXmlAttributes {
         unsafe {
-            let this: *const XmlElement = &self.0;
+            let this: *const XmlElementRef = &self.0;
             let static_iter: ManuallyDrop<Attributes<'static>> =
                 ManuallyDrop::new((*this).attributes());
             YXmlAttributes(static_iter)
@@ -157,7 +157,7 @@ impl YXmlElement {
     /// child over this XML node successors using depth-first strategy.
     pub fn tree_walker(&self) -> YXmlTreeWalker {
         unsafe {
-            let this: *const XmlElement = &self.0;
+            let this: *const XmlElementRef = &self.0;
             let static_iter: ManuallyDrop<TreeWalker<'static>> =
                 ManuallyDrop::new((*this).successors());
             YXmlTreeWalker(static_iter)
@@ -227,7 +227,7 @@ impl YXmlElement {
 /// after merging all updates together). In case of Yrs conflict resolution is solved by using
 /// unique document id to determine correct and consistent ordering.
 #[pyclass(unsendable)]
-pub struct YXmlText(pub XmlText);
+pub struct YXmlText(pub XmlTextRef);
 
 #[pymethods]
 impl YXmlText {
@@ -317,7 +317,7 @@ impl YXmlText {
     /// unspecified order.
     pub fn attributes(&self) -> YXmlAttributes {
         unsafe {
-            let this: *const XmlText = &self.0;
+            let this: *const XmlTextRef = &self.0;
             let static_iter: ManuallyDrop<Attributes<'static>> =
                 ManuallyDrop::new((*this).attributes());
             YXmlAttributes(static_iter)
@@ -415,7 +415,7 @@ impl YXmlTreeWalker {
 #[pyclass(unsendable)]
 pub struct YXmlEvent {
     inner: *const XmlEvent,
-    txn: *const Transaction,
+    txn: *const Transaction<'static>,
     target: Option<PyObject>,
     delta: Option<PyObject>,
     keys: Option<PyObject>,
@@ -497,7 +497,7 @@ impl YXmlEvent {
 
     /// Returns collection of all changes done over an array component of a current shared data
     /// type (which can be accessed via `target` property). These changes are usually done in result
-    /// of operations done on `YArray` and `YText`/`XmlText` types, but also whenever `XmlElement`
+    /// of operations done on `YArray` and `YText`/`XmlTextRef` types, but also whenever `XmlElementRef`
     /// children nodes list is modified.
     #[getter]
     pub fn delta(&mut self) -> PyObject {
@@ -522,7 +522,7 @@ impl YXmlEvent {
 #[pyclass(unsendable)]
 pub struct YXmlTextEvent {
     inner: *const XmlTextEvent,
-    txn: *const Transaction,
+    txn: *const Transaction<'static>,
     target: Option<PyObject>,
     delta: Option<PyObject>,
     keys: Option<PyObject>,

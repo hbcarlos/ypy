@@ -8,7 +8,7 @@ use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use pyo3::types::PyTuple;
 use yrs::updates::encoder::Encode;
-use yrs::AfterTransactionEvent as YrsAfterTransactionEvent;
+use yrs::TransactionCleanupEvent as YrsAfterTransactionEvent;
 use yrs::Doc;
 use yrs::OffsetKind;
 use yrs::Options;
@@ -256,7 +256,7 @@ pub fn apply_update(doc: &mut YDoc, diff: Vec<u8>) -> PyResult<()> {
 #[pyclass(unsendable)]
 pub struct AfterTransactionEvent {
     inner: *const YrsAfterTransactionEvent,
-    txn: *const Transaction,
+    txn: *const Transaction<'static>,
     before_state: Option<PyObject>,
     after_state: Option<PyObject>,
     delete_set: Option<PyObject>,
